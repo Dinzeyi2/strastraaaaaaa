@@ -31,8 +31,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
-          # Use a PAT so pushed commits trigger downstream workflows.
-          # GITHUB_TOKEN pushes do not trigger workflow_run / push events.
+          # GITHUB_TOKEN pushes do not trigger workflow_run / push events. So we use a Github App
           # See: https://docs.github.com/en/actions/concepts/security/github_token#when-github_token-triggers-workflow-runs
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -44,7 +43,7 @@ jobs:
       - name: Run sync script
         run: node skills/sync.js
 
-      - name: Auto-fix formatting issues
+      - name: Push to Github
         if: |
           github.ref == 'refs/heads/master' &&
           github.event_name == 'push' &&
