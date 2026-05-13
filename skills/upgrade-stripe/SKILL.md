@@ -1,36 +1,14 @@
 ---
 name: upgrade-stripe
-description: Guide for upgrading Stripe API versions and SDKs
+description: "Walks through upgrading Stripe API versions (e.g. 2024-12-18.acacia → 2026-04-22.dahlia), server-side SDKs (stripe-node, stripe-python, stripe-ruby, stripe-go, stripe-java, stripe-dotnet), Stripe.js major versions, and mobile SDKs (iOS, Android, React Native). Covers resolving breaking changes from the API changelog, migrating deprecated parameters and endpoints, updating webhook handlers for new event structures, and pinning explicit API versions in client initialization. Use when upgrading Stripe, handling Stripe deprecation warnings, migrating between Stripe API versions, updating Stripe SDK dependencies, resolving breaking changes after a Stripe update, or moving from legacy Stripe.js v3 to a named release."
 
 ---
 
-The latest Stripe API version is 2026-04-22.dahlia - use this version when upgrading unless the user specifies a different target version.
+Latest Stripe API version: **2026-04-22.dahlia**. Always use this version when upgrading unless the user specifies a different target.
 
-# Upgrading Stripe Versions
+## API Versioning
 
-This guide covers upgrading Stripe API versions, server-side SDKs, Stripe.js, and mobile SDKs.
-
-## Understanding Stripe API Versioning
-
-Stripe uses date-based API versions (e.g., `2026-04-22.dahlia`, `2025-08-27.basil`, `2024-12-18.acacia`). Your account’s API version determines request/response behavior.
-
-### Types of Changes
-
-**Backward-Compatible Changes** (don’t require code updates):
-
-- New API resources
-- New optional request parameters
-- New properties in existing responses
-- Changes to opaque string lengths (e.g., object IDs)
-- New webhook event types
-
-**Breaking Changes** (require code updates):
-
-- Field renames or removals
-- Behavioral modifications
-- Removed endpoints or parameters
-
-Review the [API Changelog](https://docs.stripe.com/changelog.md) for all changes between versions.
+Review the [API Changelog](https://docs.stripe.com/changelog.md) for breaking changes between your current and target versions before upgrading. Version format: `YYYY-MM-DD.codename` (e.g., `2026-04-22.dahlia`).
 
 ## Server-Side SDK Versioning
 
@@ -70,19 +48,7 @@ stripe.Customer.create(
 
 These use a fixed API version matching the SDK release date. Don’t set a different API version for strongly-typed languages because response objects might not match the strong types in the SDK. Instead, update the SDK to target a new API version.
 
-### Best Practice
-
-Always specify the API version you’re integrating against in your code instead of relying on your account’s default API version:
-
-```javascript
-// Good: Explicit version
-const stripe = require('stripe')('sk_test_xxx', {
-  apiVersion: '2026-04-22.dahlia'
-});
-
-// Avoid: Relying on account default
-const stripe = require('stripe')('sk_test_xxx');
-```
+Always pin the API version explicitly in code rather than relying on the account default.
 
 ## Stripe.js Versioning
 
@@ -126,38 +92,24 @@ You can’t override this association.
 
 See [Mobile SDK Versioning](https://docs.stripe.com/sdks/mobile-sdk-versioning.md) for details.
 
-### iOS and Android SDKs
+iOS and Android SDKs follow semver. New features and fixes release only on the latest major version — upgrade regularly.
 
-Both platforms follow **semantic versioning** (MAJOR.MINOR.PATCH):
+React Native SDK uses 0.x.y schema where minor (x) bumps contain breaking changes.
 
-- **MAJOR**: Breaking API changes
-- **MINOR**: New functionality (backward-compatible)
-- **PATCH**: Bug fixes (backward-compatible)
-
-New features and fixes release only on the latest major version. Upgrade regularly to access improvements.
-
-### React Native SDK
-
-Uses a different model (0.x.y schema):
-
-- **Minor version changes** (x): Breaking changes AND new features
-- **Patch updates** (y): Critical bug fixes only
-
-### Backend Compatibility
-
-All mobile SDKs work with any Stripe API version you use on your backend unless documentation specifies otherwise.
+All mobile SDKs work with any Stripe API version on the backend unless documentation specifies otherwise.
 
 ## Upgrade Checklist
 
-1. Review the [API Changelog](https://docs.stripe.com/changelog.md) for changes between your current and target versions
-1. Check [Upgrades Guide](https://docs.stripe.com/upgrades.md) for migration guidance
-1. Update server-side SDK package version (e.g., `npm update stripe`, `pip install --upgrade stripe`)
-1. Update the `apiVersion` parameter in your Stripe client initialization
-1. Test your integration against the new API version using the `Stripe-Version` header
-1. Update webhook handlers to handle new event structures
-1. Update Stripe.js script tag or npm package version if needed
-1. Update mobile SDK versions in your package manager if needed
-1. Store Stripe object IDs in databases that accommodate up to 255 characters (case-sensitive collation)
+1. Review the [API Changelog](https://docs.stripe.com/changelog.md) for breaking changes between your current and target versions
+2. Check the [Upgrades Guide](https://docs.stripe.com/upgrades.md) for migration guidance
+3. Update server-side SDK package version (e.g., `npm update stripe`, `pip install --upgrade stripe`)
+4. Update the `apiVersion` parameter in your Stripe client initialization
+5. Test your integration against the new API version using the `Stripe-Version` header — verify all API calls succeed and response shapes match expectations before committing. If a call fails, check the changelog for that specific breaking change and fix before proceeding.
+6. Update webhook handlers to handle new event structures — test with `stripe trigger` or replay recent events to confirm handlers parse correctly
+7. Update Stripe.js script tag or npm package version if needed
+8. Update mobile SDK versions in your package manager if needed
+9. Ensure database columns storing Stripe object IDs accommodate up to 255 characters (case-sensitive collation)
+10. **Rollback plan**: If issues surface post-deploy, revert `apiVersion` to the previous version — Stripe supports multiple versions simultaneously
 
 ## Testing API Version Changes
 
@@ -177,9 +129,4 @@ const stripe = require('stripe')('sk_test_xxx', {
 });
 ```
 
-## Important Notes
-
-- Your webhook listener should handle unfamiliar event types gracefully
-- Test webhooks with the new version structure before upgrading
-- Breaking changes are tagged by affected product areas (Payments, Billing, Connect, etc.)
-- Multiple API versions coexist simultaneously, enabling staged adoption
+Breaking changes are tagged by product area (Payments, Billing, Connect, etc.) — filter the changelog to the relevant areas for the user's integration.
