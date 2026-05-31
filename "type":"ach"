@@ -1,7 +1,7 @@
 {
-"id":"019e70ae-82af-7ea6-bebc-791ef9212f8a",
+"id":"46bbe478-6dde-4086-a2e9-323e3dfacb07",
 "type":"ach",
-"amount":100000,
+"amount":5000,
 "object":"transaction",
 "posted":true,
 "currency":"USD",
@@ -40,7 +40,7 @@
 "next":null,"last":"&page%5Bnumber%5D=1&page%5Bsize%5D=100"},
 "direction":"debit",
 "live_mode":false,
-"vendor_id":"019e70ae-5460-7606-9b56-ec371429c0fd",
+"vendor_id":"019e5b5e-b96e-7a3a-939b-1ee0f95a284c",
 "as_of_date":"2026-05-28",
 "as_of_time":"22:22:23",
 "created_at":"2026-05-28T22:22:25Z",
@@ -51,7 +51,7 @@
 "as_of_timezone":"Etc/UTC",
 "vendor_code_type":"modern_treasury",
 "custom_identifiers":{},
-"vendor_customer_id":"0199fcdc-3dc8-45a6-b825-757fedf75787",
-"internal_account_id":"ce9c989d-ea15-4b69-b35f-87332d1c5300",
+"vendor_customer_id":"019e5b5e-b96e-7a3a-939b-1ee0f95a284c",
+"internal_account_id":"46bbe478-6dde-4086-a2e9-323e3dfacb07",
 "foreign_exchange_rate":NULL
 }
